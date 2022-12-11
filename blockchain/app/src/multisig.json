@@ -1,0 +1,426 @@
+{
+  "version": "0.1.0",
+  "name": "multisig",
+  "instructions": [
+    {
+      "name": "createMultisig",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "validators",
+          "type": {
+            "vec": "publicKey"
+          }
+        },
+        {
+          "name": "threshold",
+          "type": "u64"
+        },
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "multisigId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "createProposal",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "proposalId",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "approve",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "validator",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setValidatorsAndChangeThreshold",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "multisigSigner",
+          "isMut": false,
+          "isSigner": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Multisig",
+                "path": "multisig"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "validators",
+          "type": {
+            "vec": "publicKey"
+          }
+        },
+        {
+          "name": "threshold",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "setValidators",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "multisigSigner",
+          "isMut": false,
+          "isSigner": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Multisig",
+                "path": "multisig"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "validators",
+          "type": {
+            "vec": "publicKey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "changeThreshold",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "multisigSigner",
+          "isMut": false,
+          "isSigner": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Multisig",
+                "path": "multisig"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "threshold",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "executeTransaction",
+      "accounts": [
+        {
+          "name": "multisig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "multisigSigner",
+          "isMut": false,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "account": "Multisig",
+                "path": "multisig"
+              }
+            ]
+          }
+        },
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Multisig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "multisigId",
+            "type": "u128"
+          },
+          {
+            "name": "validators",
+            "type": {
+              "vec": "publicKey"
+            }
+          },
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "threshold",
+            "type": "u64"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "validatorSetSeqno",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Proposal",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proposalId",
+            "type": "u128"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "ProposalStatus"
+            }
+          },
+          {
+            "name": "multisig",
+            "type": "publicKey"
+          },
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "signers",
+            "type": {
+              "vec": "bool"
+            }
+          },
+          {
+            "name": "didExecute",
+            "type": "bool"
+          },
+          {
+            "name": "validatorSetSeqno",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "TransactionAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pubkey",
+            "type": "publicKey"
+          },
+          {
+            "name": "isSigner",
+            "type": "bool"
+          },
+          {
+            "name": "isWritable",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProposalStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Submitted"
+          },
+          {
+            "name": "Approved"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "ProposalStatusChanged",
+      "fields": [
+        {
+          "name": "proposalId",
+          "type": "u128",
+          "index": false
+        },
+        {
+          "name": "status",
+          "type": {
+            "defined": "ProposalStatus"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ProposalApprovedByValidators",
+      "fields": [
+        {
+          "name": "validator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "proposalId",
+          "type": "u128",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MultisigCreated",
+      "fields": [
+        {
+          "name": "multisigId",
+          "type": "u128",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidValidator",
+      "msg": "The given validator is not part of this multisig."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidValidatorsLen",
+      "msg": "Validators length must be non zero."
+    },
+    {
+      "code": 6002,
+      "name": "NotEnoughSigners",
+      "msg": "Not enough Validators signed this transaction."
+    },
+    {
+      "code": 6003,
+      "name": "TransactionAlreadySigned",
+      "msg": "Cannot delete a transaction that has been signed by an Validator."
+    },
+    {
+      "code": 6004,
+      "name": "Overflow",
+      "msg": "Overflow when adding."
+    },
+    {
+      "code": 6005,
+      "name": "UnableToDelete",
+      "msg": "Cannot delete a transaction the Validator did not create."
+    },
+    {
+      "code": 6006,
+      "name": "AlreadyExecuted",
+      "msg": "The given transaction has already been executed."
+    },
+    {
+      "code": 6007,
+      "name": "InvalidThreshold",
+      "msg": "Threshold must be less than or equal to the number of Validators."
+    },
+    {
+      "code": 6008,
+      "name": "UniqueValidators",
+      "msg": "Validators must be unique"
+    }
+  ],
+  "metadata": {
+    "address": "3SunHKjBFnPm9XJn5qqeR9M4janhCexwfJkg5jBnRc2P"
+  }
+}
